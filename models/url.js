@@ -1,5 +1,10 @@
 var mongoose = require('mongoose');
+var connection = require('./connection');
 var Schema = mongoose.Schema;
+
+connection.once('open',function() {
+  console.log("Connected....");
+});
 
 var CounterSchema = Schema({
     _id: {type: String, required: true},
@@ -17,9 +22,10 @@ var urlSchema = new Schema({
 
 urlSchema.pre('save', function(next){
   var doc = this;
-  counter.findByIdAndUpdate({_id: 'url_count'}, {$inc: {seq: 1} }, function(error, counter) {
+  counter.findByIdAndUpdate({_id: 'url_count'}, {$inc: {seq: 1}}, function(error, counter) {
       if (error)
           return next(error);
+          console.log(counter);
       doc.created_at = new Date();
       doc._id = counter.seq;
       next();
