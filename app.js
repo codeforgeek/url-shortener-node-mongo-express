@@ -9,9 +9,6 @@ var base58 = require('./base58.js');
 // grab the url model
 var Url = require('./models/url');
 
-//mongoose.connect('mongodb://' + config.db.host + '/' + config.db.name);
-//mongoose.connect(config.db.uri);
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -63,7 +60,12 @@ app.get('/:encoded_id', function(req, res){
   // check if url already exists in database
   Url.findOne({_id: id}, function (err, doc){
     if (doc) {
-      res.redirect(doc.long_url);
+      Url.update({_id: id},{$inc: {clicked: 1}},function(err,data) {
+        if(err) {
+          console.log("error updating the count");
+        }
+        res.redirect(doc.long_url);
+      });
     } else {
       res.redirect(config.webhost);
     }
